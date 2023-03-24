@@ -1,41 +1,62 @@
 import 'package:flutter/material.dart';
-import 'questionScreen.dart';
+import 'package:flutter_test_app/gamePage.dart';
 import 'question.dart';
+import 'resultsPage.dart';
+
 
 class Game {
   final List<Question> questions;
-  final List<QuestionScreen> questionScreens = [];
   late int currentQuestionIndex;
   late int score;
   late final PageController pageController = PageController();
 
-  Game(this.questions){
-    for (Question question in questions) {
-      questionScreens.add(QuestionScreen(question: question, game: this));
-    }
-  }
+  Game(this.questions);
 
   void showNextQuestion(BuildContext context) {
     currentQuestionIndex ++;
-    pageController.nextPage(duration: Duration(milliseconds: 100), curve: Curves.easeInOut);
+    //pageController.nextPage(duration: const Duration(milliseconds: 100), curve: Curves.easeInOut);
+    jumpToQuestion(currentQuestionIndex);
   }
 
   void showPrevQuestion(BuildContext context) {
     currentQuestionIndex --;
-    pageController.previousPage(duration: Duration(milliseconds: 100), curve: Curves.easeInOut);
+    //pageController.previousPage(duration: const Duration(milliseconds: 100), curve: Curves.easeInOut);
+    jumpToQuestion(currentQuestionIndex);
   }
 
   void jumpToQuestion(int questionIndex) {
     currentQuestionIndex = questionIndex;
-    pageController.animateToPage(questionIndex, duration: Duration(milliseconds: 100), curve: Curves.bounceIn);
+    pageController.animateToPage(questionIndex, duration: const Duration(milliseconds: 100), curve: Curves.bounceIn);
   }
 
-  bool get isFinished => currentQuestionIndex >= questionScreens.length;
+  void selectAnswerForQuestion(BuildContext context, int answerIndex) {
+    questions[currentQuestionIndex].setSelectedAnswerIndex(answerIndex);
+    // Get the score
+    if (isFinished()) {
+      //Navigator.push(
+       // context,
+        //MaterialPageRoute(
+         // builder: (context) => ResultsPage(score: finalScore, questions: questions),
+        //),
+      //);
+    }
+  }
+
+
+  bool isFinished() {
+    for (var question in questions) {
+      if (question.selectedAnswerIndex == -1) {
+        return false;
+      }
+    }
+    return true;
+  }
+
 
   int get finalScore {
     int score = 0;
-    for (QuestionScreen questionScreen in questionScreens) {
-      score += questionScreen.question.selectedAnswerIndex == questionScreen.question.correctAnswerIndex ? 1 : 0;
+    for (Question question in questions) {
+      score += question.selectedAnswerIndex == question.correctAnswerIndex ? 1 : 0;
     }
     return score;
   }
@@ -45,11 +66,9 @@ class Game {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PageView(
-          controller: pageController,
-          children: questionScreens,
-        ),
+        builder: (context) => GamePage(game: this)
       ),
     );
   }
+
 }

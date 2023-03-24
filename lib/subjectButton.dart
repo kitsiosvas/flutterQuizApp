@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test_app/questionScreen.dart';
 import 'game.dart';
 import 'question.dart';
+import 'dart:math';
 
 class SubjectButton extends StatelessWidget {
   final String subject;
@@ -32,11 +32,10 @@ class SubjectButton extends StatelessWidget {
         onPressed: () {
           // Create 30 dummy questions for now
           List<Question> questions = [];
-          List<QuestionScreen> questionScreens = [];
+          final Random random = Random();
           for (int i = 1; i <= 30; i++) {
-            questions.add(Question("Q$i", ["A1", "A2", "A3", "A4"], 2));
+            questions.add(Question("Q$i", ["A1", "A2", "A3", "A4"], random.nextInt(4)));
           }
-
 
           Game game = Game(questions);
           game.start(context);
